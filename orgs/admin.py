@@ -1,5 +1,5 @@
 from django.contrib import admin
 
 # Register your models here.
-class PaymentAdmin(admin.ModelAdmin):
+class OrgAdmin(admin.ModelAdmin):
     pass
