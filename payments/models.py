@@ -1,6 +1,8 @@
 import uuid
 
 from django.db import models
+from django.db.models import Q
+from django.db.models.constraints import CheckConstraint
 
 from orgs.models import Organization
 
@@ -45,3 +47,9 @@ class Payment(models.Model):
     class Meta:
         verbose_name = "Платеж"
         verbose_name_plural = "Платежи"
+        constraints = [
+            CheckConstraint(
+                check=Q(amount__gt=0),
+                name="positive_amount",
+            )
+        ]
