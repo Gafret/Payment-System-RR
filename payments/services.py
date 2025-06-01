@@ -12,17 +12,20 @@ logger = logging.getLogger(__name__)
 
 @transaction.atomic
 def create_payment(
-    *, id: str, amount: float, payer_inn: str, document_number: str, document_date: str
+    *, operation_id: str, amount: float, payer_inn: str, document_number: str, document_date: str
 ) -> Union[Payment, None]:
-    try:
-        org = get_org_by_inn(payer_inn)
-    except Organization.DoesNotExist as e:
+
+    org = get_org_by_inn(payer_inn)
+    if org is None:
+        # We register organisation forcefully because if we get
+        # some invoice, there is an intention to notify us about
+        # it, we'd rather have a record than not (esp. since inn isn't confidential)
         logger.info("В базу внесена новая компания/физ.лицо")
         org = Organization.objects.create(inn=payer_inn)
 
     try:
         payment = Payment.objects.create(
-            id=id,
+            id=operation_id,
             amount=amount,
             payer_inn=org,
             document_number=document_number,

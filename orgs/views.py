@@ -6,12 +6,12 @@ from orgs.selectors import get_org_by_inn
 
 def get_org_balance(request: HttpRequest, inn: str):
     if request.method == "GET":
-        try:
-            org = get_org_by_inn(inn)
-        except Organization.DoesNotExist:
+        org = get_org_by_inn(inn)
+
+        if org is None:
             return JsonResponse({"msg": "Такой организации нет"}, status=404)
 
-        balance = org.balance
+        balance = org.balance.get("amount__sum", "null")
 
         return JsonResponse({
             "inn": org.inn,
