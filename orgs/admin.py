@@ -1,5 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from orgs.models import Organization
+
+
 class OrgAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ["inn"]
+
+
+admin.site.register(Organization, OrgAdmin)
