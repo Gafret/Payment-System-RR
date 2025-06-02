@@ -1,6 +1,7 @@
 import logging
 from typing import Union
 
+from django.core.exceptions import ValidationError
 from django.db import transaction, IntegrityError
 
 from orgs.models import Organization
@@ -20,8 +21,11 @@ def create_payment(
         # We register organisation forcefully because if we get
         # some invoice, there is an intention to notify us about
         # it, we'd rather have a record than not (esp. since inn isn't confidential)
-        logger.info("В базу внесена новая компания/физ.лицо")
-        org = Organization.objects.create(inn=payer_inn)
+        try:
+            org = Organization.objects.create(inn=payer_inn)
+            logger.info("В базу внесена новая компания/физ.лицо")
+        except IntegrityError as e:
+            raise ValidationError("Неверный формат данных организации")
 
     try:
         payment = Payment.objects.create(
@@ -33,7 +37,12 @@ def create_payment(
         )
         logging.info(f"Пополнен баланс", extra={"org": org, "amount": amount})
     except IntegrityError as e:
-        logging.error("Данная операция уже была проведена", extra={"err": e})
-        return
+        cause = e.args[0]
+        if cause == 1062:  # duplicate id
+            logging.error("Данная операция уже была проведена", extra={"err": e})
+            return
+        elif cause == 3819:  # bad request data for payment
+            raise ValidationError("Неверный формат платежа")
+        raise e
 
     return payment
