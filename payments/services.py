@@ -23,7 +23,7 @@ def create_payment(
         # it, we'd rather have a record than not (esp. since inn isn't confidential)
         try:
             org = Organization.objects.create(inn=payer_inn)
-            logger.info("В базу внесена новая компания/физ.лицо")
+            logger.info(f"В базу внесена новая компания/физ.лицо {payer_inn}")
         except IntegrityError as e:
             raise ValidationError("Неверный формат данных организации")
 
@@ -35,11 +35,10 @@ def create_payment(
             document_number=document_number,
             document_date=document_date,
         )
-        logging.info(f"Пополнен баланс", extra={"org": org, "amount": amount})
+        logging.info(f"Пополнен баланс {org} на {amount}")
     except IntegrityError as e:
         cause = e.args[0]
         if cause == 1062:  # duplicate id
-            logging.error("Данная операция уже была проведена", extra={"err": e})
             return
         elif cause == 3819:  # bad request data for payment
             raise ValidationError("Неверный формат платежа")
