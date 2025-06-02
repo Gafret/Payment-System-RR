@@ -1,5 +1,6 @@
 import json
 
+from django.core.exceptions import ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -13,7 +14,7 @@ def handle_payment_request(request: HttpRequest):
 
         try:
             create_payment(**payment_data)
-        except TypeError:
+        except (TypeError, ValidationError):
             return HttpResponse(status=400)
 
         return HttpResponse(status=200)
