@@ -7,7 +7,7 @@ def get_org_balance(request: HttpRequest, inn: str):
     if request.method == "GET":
         inn_len = len(inn)
         if inn_len != 10 and inn_len != 12:  # check before db hit
-            return JsonResponse({"msg": "Неверный формат ИНН"})
+            return JsonResponse({"msg": "Неверный формат ИНН"}, status=400)
 
         org = get_org_by_inn(inn)
 
