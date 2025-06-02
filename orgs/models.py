@@ -34,7 +34,7 @@ class Organization(models.Model):
         verbose_name_plural = "Организации"
         constraints = [
             CheckConstraint(
-                check=Q(inn__length__gte=10) & Q(inn__length__lte=12),
+                check=Q(inn__length=10) | Q(inn__length=12),
                 name="inn_length",
             )
         ]
