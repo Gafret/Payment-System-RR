@@ -1,5 +1,5 @@
-from django.core.validators import MinLengthValidator
 from django.db import models
+from django.db.models import CheckConstraint, Q
 
 
 class Organization(models.Model):
@@ -18,7 +18,6 @@ class Organization(models.Model):
         primary_key=True,
         editable=False,
         max_length=12,
-        validators=[MinLengthValidator(10, "INN can't be shorter than 10")],
         verbose_name="ИНН",
     )
 
@@ -33,3 +32,9 @@ class Organization(models.Model):
     class Meta:
         verbose_name = "Организация"
         verbose_name_plural = "Организации"
+        constraints = [
+            CheckConstraint(
+                check=Q(inn__length__gte=10) & Q(inn__length__lte=12),
+                name="inn_length",
+            )
+        ]
