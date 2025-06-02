@@ -1,6 +1,5 @@
 from django.http import HttpRequest, JsonResponse, HttpResponse
 
-from orgs.models import Organization
 from orgs.selectors import get_org_by_inn
 
 
