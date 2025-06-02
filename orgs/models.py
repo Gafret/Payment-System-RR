@@ -24,7 +24,8 @@ class Organization(models.Model):
     @property
     def balance(self):
         """Current company's balance"""
-        return self.payments.aggregate(models.Sum("amount"))
+        sum = self.payments.aggregate(models.Sum("amount"))["amount__sum"]
+        return sum
 
     def __str__(self):
         return self.inn

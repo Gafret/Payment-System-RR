@@ -14,11 +14,9 @@ def get_org_balance(request: HttpRequest, inn: str):
         if org is None:
             return JsonResponse({"msg": "Такой организации нет"}, status=404)
 
-        balance = org.balance.get("amount__sum", "null")
-
         return JsonResponse({
             "inn": org.inn,
-            "balance": balance
+            "balance": org.balance
         }, status=200)
 
     return HttpResponse(status=405)
